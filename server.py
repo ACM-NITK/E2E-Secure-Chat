@@ -1,15 +1,14 @@
-from flask import Flask,render_template, request, redirect, url_for
 
-app=Flask(__name__)
+from flask import Flask, render_template
+from flask_socketio import SocketIO
 
+app = Flask(__name__)
+socketio = SocketIO(app)
 
 @app.route('/')
-def index():
+def login():
     return render_template('login.html')
 
-@app.route('/chat')
-def chat():
-    return render_template('chat.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True)

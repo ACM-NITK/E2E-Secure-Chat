@@ -1,3 +1,42 @@
-<html>
-    <h1>Chat page</h1>
+<!DOCTYPE>
+
+<head>
+    <title>Chat</title>
+</head>
+
+<div id="wrapper">
+    <div id="menu">
+        <p class="chat"><b>Chat</b></p>
+    </div>
+    <form name="message" action="">
+        <input name="usermsg" type="text" type="submit" id="usermsg" size="63" />
+    </form>
+    <button name="submitmsg" id="submitmsg" >Submit</button>
+    <ul id="messages"></ul>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+<script type="text/javascript">
+var input = document.getElementById("usermsg");
+input.addEventListener("keyup", function(event) {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+        document.getElementById("submitmsg").click();
+    }
+});
+    $(document).ready(function () {
+        var socket = io.connect("http://127.0.0.1:5000/")
+
+        socket.on('message', function (msg) {
+            $("#messages").append('<li>' + msg + '</li>');
+        });
+
+        $("#submitmsg").on('click',function(){
+            socket.send($('#usermsg').val());
+            $('#usermsg').val('');
+        });
+    });
+</script>
+</body>
+
 </html>

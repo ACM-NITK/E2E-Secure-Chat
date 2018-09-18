@@ -21,5 +21,5 @@ pip install -r requirements.txt
 ```
 To run the project as a stand-alone WSGI application:
 ```
-gunicorn --worker-class socketio.sgunicorn.GeventSocketIOWorker server:app
+python server.py
 ```

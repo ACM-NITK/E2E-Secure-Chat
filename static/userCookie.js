@@ -16,4 +16,4 @@ function storeValues(form){
 	setCookie("username",form.username.value);
 	return true;
 }
-console.log("dfg");
+

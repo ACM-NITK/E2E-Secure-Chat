@@ -1,16 +1,16 @@
 <html>
-		<script src="{{url_for('static', filename='userCookie.js')}}"></script>
-		<h3>Login Page</h3>
-		<form name="loginForm" action="/chat" onsubmit="return storeValues(this);">
-		<div class="container">
-    			
-			<label for="username"><b>Username</b></label>
-    			<input type="text" placeholder="Enter Username" name="username" value="" required>
-    			<button type="submit">Login</button>
-  		</div>
-		</form>
-		<script type="text/javascript">
-		if(username = getCookie("username"))
-  		document.loginForm.username.value = username;
-	</script>
+<script src="{{url_for('static', filename='userCookie.js')}}"></script>
+<h3>Login Page</h3>
+<form name="loginForm" action="/chat" onsubmit="return storeValues(this);">
+	<div class="container">
+
+		<input type="text" id="username">
+		<button id="send_username">Send Username</button>
+	</div>
+</form>
+<script type="text/javascript">
+	if (username = getCookie("username"))
+		document.loginForm.username.value = username;
+</script>
+
 </html>

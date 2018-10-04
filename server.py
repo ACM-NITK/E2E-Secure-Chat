@@ -1,14 +1,15 @@
 
 from flask import Flask,render_template, request, redirect, url_for
-from flask_socketio import SocketIO, send
+from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
 socketio = SocketIO(app)
 
 @socketio.on('message')
-def handlemessage(msg):
-    send( msg ,broadcast=True)
+def handlemessage( json ):
+    print('message received '+ str( json ))
+    socketio.emit('message', json)  
 
 @app.route('/')
 def index():

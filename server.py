@@ -16,13 +16,13 @@ def handlemessage( json ):
 def index():
     return render_template('login.html')
 
- @app.route('/chat')
- def chat()
-     return render_template('chat.html')
+@app.route('/chat')
+def chat():
+    return render_template('chat.html')
 
 @socketio.on('message from user', namespace='/messages')
 def receive_message_from_user(message):
-    emit('from flask', broadcast=True)
+    emit('from flask', message, broadcast=True)
 
 @socketio.on('username', namespace='/private')
 def receive_username(username):

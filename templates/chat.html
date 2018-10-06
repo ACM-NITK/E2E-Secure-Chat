@@ -1,42 +1,77 @@
-<!DOCTYPE>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
     <title>Chat</title>
 </head>
 
-<div id="wrapper">
-    <div id="menu">
-        <p class="chat"><b>Chat</b></p>
-    </div>
-    <form name="message" action="">
-        <input name="usermsg" type="text" type="submit" id="usermsg" size="63" />
-    </form>
-    <button name="submitmsg" id="submitmsg" >Submit</button>
-    <ul id="messages"></ul>
-</div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
-<script type="text/javascript">
-var input = document.getElementById("usermsg");
-input.addEventListener("keyup", function(event) {
-    event.preventDefault();
-    if (event.keyCode === 13) {
-        document.getElementById("submitmsg").click();
-    }
-});
-    $(document).ready(function () {
-        var socket = io.connect("http://127.0.0.1:5000/")
+<body>
+    <input type="text" id="message">
+    <button id="send">Send</button>
 
-        socket.on('message', function (msg) {
-            $("#messages").append('<li>' + msg + '</li>');
+    <input type="text" id="username">
+    <button id="send_username">Send Username</button>
+
+    <br>
+    <br>
+    <br> Send To: <input type="text" id="send_to_username"> Message: <input type="text" id="private_message">
+    <button id="send_private_message">Send</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
+<ul id="messages"></ul>
+<script src="{{url_for('static', filename='userCookie.js')}}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+<!-- <script>
+            window.onload = function(){
+                document.getElementById('welcome').innerHTML = "Welcome " + getCookie("username");
+            }
+                </script> -->
+<script src="http://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
+<script>
+    $(document).ready(function () {
+
+        var socket = io.connect('http://127.0.0.1:5000');
+
+        var socket_messages = io('http://127.0.0.1:5000/messages')
+
+        $('#send').on('click', function () {
+            var message = $('#message').val();
+
+            socket_messages.emit('message from user', message);
+
         });
 
-        $("#submitmsg").on('click',function(){
-            socket.send($('#usermsg').val());
-            $('#usermsg').val('');
+        socket_messages.on('from flask', function (msg) {
+            alert(msg);
+        });
+
+
+        var private_socket = io('http://127.0.0.1:5000/private')
+
+        $('#send_username').on('click', function () {
+            private_socket.emit('username', $('#username').val());
+        });
+
+        $('#send_private_message').on('click', function () {
+            var recipient = $('#send_to_username').val();
+            var message_to_send = $('#private_message').val();
+
+            private_socket.emit('private_message', { 'username': recipient, 'message': message_to_send });
+        });
+
+        private_socket.on('new_private_message', function (msg) {
+            $("#messages").append('<li>' + msg + '</li>');
         });
     });
 </script>
+
 </body>
 
 </html>

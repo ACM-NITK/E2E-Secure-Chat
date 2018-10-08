@@ -34,6 +34,7 @@
                 </script> -->
 <script src="http://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
     crossorigin="anonymous"></script>
+<script src="script.js"></script>
 <script>
     $(document).ready(function () {
 
@@ -43,8 +44,7 @@
 
         $('#send').on('click', function () {
             var message = $('#message').val();
-
-            socket_messages.emit('message from user', message);
+            socket_messages.emit('message from user', b);
 
         });
 
@@ -62,11 +62,12 @@
         $('#send_private_message').on('click', function () {
             var recipient = $('#send_to_username').val();
             var message_to_send = $('#private_message').val();
-
+            //var b=encodeString(message_to_send,"123");
             private_socket.emit('private_message', { 'username': recipient, 'message': message_to_send });
         });
 
         private_socket.on('new_private_message', function (msg) {
+            //var x=encodeString(msg,"123");
             $("#messages").append('<li>' + msg + '</li>');
         });
     });

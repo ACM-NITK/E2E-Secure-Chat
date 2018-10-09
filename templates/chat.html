@@ -7,15 +7,18 @@
 </head>
 
 <body>
-    <input type="text" id="message">
-    <button id="send">Send</button>
-
+    <h1>Messenger App</h1>
+    <!--<input type="text" id="message">
+    <button id="send">Send</button>-->
+    <br><br>
     <input type="text" id="username">
     <button id="send_username">Send Username</button>
 
     <br>
     <br>
-    <br> Send To: <input type="text" id="send_to_username"> Message: <input type="text" id="private_message">
+    <br> 
+    Send To: <input type="text" id="send_to_username"> <br> <br> 
+    Message: <input type="text" id="private_message"> <br> <br> 
     <button id="send_private_message">Send</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
@@ -62,16 +65,27 @@
         $('#send_private_message').on('click', function () {
             var recipient = $('#send_to_username').val();
             var message_to_send = $('#private_message').val();
-
-            private_socket.emit('private_message', { 'username': recipient, 'message': message_to_send });
+            private_socket.emit('private_message', { 'username': recipient, 'message': encodeString(message_to_send) });
         });
 
         private_socket.on('new_private_message', function (msg) {
-            $("#messages").append('<li>' + msg + '</li>');
+            $("#messages").append('<li>' + decodeString(msg) + '</li>');
         });
     });
 </script>
+<script type="text/javascript">
+    //this function needs to be rewritten with a stronger encryption scheme.
+    function encodeString(str)
+    {
+        var result = escape(str);    
+        return result;
+    }
+    function decodeString(str)
+    {
+        var result=unescape(str);
+        return result;
+    }
 
+</script>
 </body>
-
 </html>

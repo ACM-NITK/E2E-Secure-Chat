@@ -1,16 +1,24 @@
 <html>
 <head>
 	<script src="{{url_for('static', filename='userCookie.js')}}"></script>
+	<script type="text/javascript" src="cookie.js"></script>
 </head>
 <body>
-	<h3>Login Page</h3>
+	<h3>Login Page</h3>	
 	<form name="loginForm" action="/chat" onsubmit="return storeValues(this);">
 		<div class="container">
-			<input type="text" id="username">
-			<button id="send_username">Send Username</button>
+			Enter Username:<input type="text" id="username"><br>
+			<button id="send_username" onclick=store_cookie()>Login</button>
 		</div>
 	</form>
 	<script type="text/javascript">
+		function store_cookie()
+		{
+			var userInput = document.getElementById("username").value;
+            setCookie("Username",username,30);
+            checkCookie();
+		}
+
 		if (username = getCookie("username"))
 			document.loginForm.username.value = username;
 	</script>

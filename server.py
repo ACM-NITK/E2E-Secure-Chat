@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_socketio import SocketIO, send, emit
-
+from werkzeug import secure_filename
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
@@ -35,6 +35,18 @@ def private_message(payload):
     message = payload['message']
 
     emit('new_private_message', message, room=recipient_session_id)
+
+@app.route('/upload')
+def upload_file():
+   return render_template('upload.html')
+	
+@app.route('/uploader', methods = ['GET', 'POST'])
+def uploader_file():
+   if request.method == 'POST':
+      f = request.files['file']
+      f.save(secure_filename(f.filename))  #saves the file 
+      print('file saved')
+      return redirect(url_for('chat'))  #socketio.emit('uploadfile', f) wont work
 
 if __name__ == '__main__':
     socketio.run(app)

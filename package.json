@@ -1,0 +1,16 @@
+{
+  
+  "version": "1.0.0",
+  "description": "",
+  "main": "sig_gen_and_verify.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "blueimp-md5": "^2.10.0",
+    "node-forge": "^0.7.6"
+  }
+}

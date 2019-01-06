@@ -1,7 +1,9 @@
 function getCookie(name){
 	var re=new RegExp(name+"=([^;]+)");
 	var value=re.exec(document.cookie);
-	return(value!=null)?unescape(value[1]):null;
+	console.log(value)
+	//return(value!=null)?unescape(value[1]):null;
+	return value;
 }
 var today=new Date();
 var expiry=new Date(today.getTime()+30*24*3600*1000);
@@ -15,5 +17,8 @@ function deleteCookie(name){
 function storeValues(form){
 	setCookie("username",form.username.value);
 	return true;
+}
+function hello(){
+	console.log("hello");
 }
 

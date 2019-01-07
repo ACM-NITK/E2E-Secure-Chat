@@ -1,26 +1,39 @@
 <html>
 <head>
 	<script src="{{url_for('static', filename='userCookie.js')}}"></script>
-	<script type="text/javascript" src="cookie.js"></script>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/login.css') }}">
 </head>
 <body>
-	<h3>Login Page</h3>	
+	<!--<h3>Login Page</h3>	
 	<form name="loginForm" action="/chat" onsubmit="return storeValues(this);">
 		<div class="container">
 			Enter Username:<input type="text" id="username"><br>
 			<button id="send_username" onclick=store_cookie()>Login</button>
 		</div>
-	</form>
+	</form>-->
 	<script type="text/javascript">
 		function store_cookie()
 		{
 			var userInput = document.getElementById("username").value;
-            setCookie("Username",username,30);
+			setCookie("Username",userInput,30);
             checkCookie();
 		}
 
 		if (username = getCookie("username"))
 			document.loginForm.username.value = username;
 	</script>
+
+<div class="al"></div>
+<div class="container">
+ <form name="loginForm" action="/chat" onsubmit="return storeValues(this);">
+ <div class="header">Sign In</div>
+ <input id='username' class='text' onfocus="handle2()" class='inc2' type="text" name="Username" placeholder='Username' value="">
+
+ <button id="send_username" onclick=store_cookie()>Sign In</button>
+ <svg width="390" height="549" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <rect id='rect' class='rect1'   x="45px"  y="300px"   rx="27" ry="27" width="300px" height="50px" style="stroke: #fff; stroke-width: 1px; fill: #000" />
+</svg>
+</form>
+</div>
 </body>
 </html>

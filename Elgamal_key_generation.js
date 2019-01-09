@@ -31,9 +31,15 @@ function power(x, y, p) {
     }
     return res;
 }
-
-max = 126;
-min = 32;
+function modInverse(a, m) 
+{ 
+    a = a%m; 
+    for (x=1; x<m; x++) 
+       if ((a*x) % m == 1) 
+          return x; 
+} 
+// max = 126;
+// min = 32;
 function encrypt(msg, q, h, g) {
 
     // en_msg = []
@@ -58,14 +64,31 @@ function encrypt(msg, q, h, g) {
         // console.log(en2_msg[i]);
         // console.log(en_msg.charCodeAt(i));
     }
-    console.log(en2_msg);
+    // console.log(en2_msg);
     return [en2_msg, p];
+}
+
+function decrypt(en_msg, p, a, q)
+{  
+    var dr_msg = ""; 
+    h = power(p, a, q) 
+    // console.log(h);
+    console.log(modInverse(h,128));
+    for(i=0;i<en_msg.length;i++) 
+    {
+        // console.log((en_msg.charCodeAt(i)*modInverse(h,128))%128);
+        // console.log(String.fromCharCode((en_msg.charCodeAt(i))/(h%128)));
+        // console.log(String.fromCharCode(en_msg.charCodeAt(i)/h));
+        dr_msg += String.fromCharCode((en_msg.charCodeAt(i)*modInverse(h,128))%128); 
+        // console.log(dr_msg[i]);
+    }  
+    return dr_msg;
 }
 // max = Math.pow(10,50);
 // min = Math.pow(10,2);
 //GENERATE PRIME q
 var msg = "blah";
-var q = getRandomInt(Math.pow(10, 2), Math.pow(10, 10));
+var q = getRandomInt(Math.pow(10, 2), Math.pow(10, 3));
 var g = getRandomInt(2, q);
 var a = generate_private_key(q);
 var h = power(g, a, q);
@@ -75,4 +98,8 @@ console.log('g is ' + g);
 console.log('g^a is ' + h);
 
 var result = encrypt(msg, q, h, g);
-console.log(result[0]);
+console.log("Encrypted message is " + result[0]);
+// console.log(p);
+var decrypted_msg = decrypt(result[0], result[1], a, q);
+console.log("Decrypted message is " + decrypted_msg);
+

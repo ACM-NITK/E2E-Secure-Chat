@@ -1,5 +1,4 @@
 {
-  
   "version": "1.0.0",
   "description": "",
   "main": "sig_gen_and_verify.js",
@@ -11,6 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "blueimp-md5": "^2.10.0",
+    "crypto": "^1.0.1",
+    "futoin-hkdf": "^1.0.3",
+    "hkdf": "0.0.2",
     "node-forge": "^0.7.6"
   }
 }

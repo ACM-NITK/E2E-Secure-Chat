@@ -1,5 +1,4 @@
 {
-  
   "version": "1.0.0",
   "description": "",
   "main": "sig_gen_and_verify.js",
@@ -11,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "blueimp-md5": "^2.10.0",
-    "node-forge": "^0.7.6"
+    "fast-sha256": "^1.1.0",
+    "node-forge": "^0.7.6",
+    "tweetnacl-util": "^0.15.0"
   }
 }

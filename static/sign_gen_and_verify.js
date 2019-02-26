@@ -1,6 +1,3 @@
-import sys;
-import math;
-
 const forge = require('node-forge');
 const blueimp_md5 = require('blueimp-md5');
 

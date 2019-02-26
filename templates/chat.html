@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Chat</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/chat.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
         crossorigin="anonymous"></script>
@@ -11,18 +12,39 @@
 </head>
 
 <body>
-    <h1>Messenger App</h1>
-    
-    Send To: <input type="text" id="send_to_username"> <br> <br> 
-    Message: <input type="text" id="private_message"> <br> <br> 
-    <button id="send_private_message">Send</button>
+
+    <h1 class="center-align heading">E2E Secure Chatroom</h1>
+    <div class="row">
+        <div class="col-6 message-form">
+            
+            Send&nbsp;To&nbsp;&nbsp;&nbsp;<input type="text" id="send_to_username"> <br> <br> 
+            Message&nbsp;<input type="text" id="private_message"> <br> <br> 
+            <button id="send_private_message">Send</button>
+        </div>
+
+        <!-- <form action = "http://localhost:5000/uploader" method = "POST" 
+             enctype = "multipart/form-data">
+             <input type = "file" name = "file" />
+             <input type = "submit"/>
+        </form> -->
+        <div class="col-1"></div>
+        <div class="col-4">
+            <form action="/uploader" method="POST">
+                <div class="file-upload">
+                    <div class="file-select">
+                        <div class="file-select-button" id="fileName">Choose File</div>
+                        <div class="file-select-name" id="noFile">No file chosen...</div> 
+                        <input type="file" name="chooseFile" id="chooseFile">
+                    </div>
+                </div>
+                <br/>
+                <button id="submit">Submit</button>
+            </form>
+        </div>
+        <div class="col-1"></div>
+    </div>
 
     <ul id="messages"></ul>
-    <form action = "http://localhost:5000/uploader" method = "POST" 
-         enctype = "multipart/form-data">
-         <input type = "file" name = "file" />
-         <input type = "submit"/>
-      </form>
 
 <script>
     $(document).ready(function () {

@@ -23,17 +23,14 @@
 			document.loginForm.username.value = username;
 	</script>
 
-<div class="al"></div>
-<div class="container">
- <form name="loginForm" action="/chat" onsubmit="return storeValues(this);">
- <div class="header">Sign In</div>
- <input id='username' class='text' onfocus="handle2()" class='inc2' type="text" name="Username" placeholder='Username' value="">
-
- <button id="send_username" onclick=store_cookie()>Sign In</button>
- <svg width="390" height="549" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-      <rect id='rect' class='rect1'   x="45px"  y="300px"   rx="27" ry="27" width="300px" height="50px" style="stroke: #fff; stroke-width: 1px; fill: #000" />
-</svg>
-</form>
-</div>
+	<div class="al"></div>
+	<br/><br/>
+	<div class="heading">E2E Secure Chat</div><br/><br/><br/><br/>
+	<div class="container">
+		<form name="loginForm" action="/chat" onsubmit="return storeValues(this);">
+			<input id='username' size="40" class='text' onfocus="handle2()" class='inc2' type="text" name="Username" placeholder='Username' value=""><br/><br/>
+			<button id="send_username" onclick=store_cookie()>Check In</button>
+		</form>
+	</div>
 </body>
 </html>

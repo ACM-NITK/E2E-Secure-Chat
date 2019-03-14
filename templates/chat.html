@@ -6,9 +6,15 @@
     <title>Chat</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/chat.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
-    <script src="http://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-        crossorigin="anonymous"></script>
+    <script src="http://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='Elgamal_key_generation.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='hkdf.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='nacl-util.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='nacl-util.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='sha256.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='HMAC.js') }}"></script>
 </head>
 
 <body>
@@ -16,9 +22,9 @@
     <h1 class="center-align heading">E2E Secure Chatroom</h1>
     <div class="row">
         <div class="col-6 message-form">
-            
-            Send&nbsp;To&nbsp;&nbsp;&nbsp;<input type="text" id="send_to_username"> <br> <br> 
-            Message&nbsp;<input type="text" id="private_message"> <br> <br> 
+
+            Send&nbsp;To&nbsp;&nbsp;&nbsp;<input type="text" id="send_to_username"> <br> <br>
+            Message&nbsp;<input type="text" id="private_message"> <br> <br>
             <button id="send_private_message">Send</button>
         </div>
 
@@ -33,11 +39,11 @@
                 <div class="file-upload">
                     <div class="file-select">
                         <div class="file-select-button" id="fileName">Choose File</div>
-                        <div class="file-select-name" id="noFile">No file chosen...</div> 
+                        <div class="file-select-name" id="noFile">No file chosen...</div>
                         <input type="file" name="chooseFile" id="chooseFile">
                     </div>
                 </div>
-                <br/>
+                <br />
                 <button id="submit">Submit</button>
             </form>
         </div>
@@ -46,53 +52,117 @@
 
     <ul id="messages"></ul>
 
-<script>
-    $(document).ready(function () {
+    <script>
+        $(document).ready(function () {
 
-        var socket = io.connect('http://127.0.0.1:5000');
-        var socket_messages = io('http://127.0.0.1:5000/messages')
-       
-        $('#send').on('click', function () {
-            var message = $('#message').val();
+            var socket = io.connect('http://127.0.0.1:5000');
+            var socket_messages = io('http://127.0.0.1:5000/messages')
+            var socket_keys = io('http://127.0.0.1:5000/keys')
 
-            socket_messages.emit('message from user', message);
+            var self_key_pair = generatePair();
+            re = new RegExp(name + "=([^;]+)");
+            value = re.exec(document.cookie);
+            username = value[1]
+            arr = [username, self_key_pair[1]]
+            socket_keys.emit('publKey', arr)
+            console.log("Key Pair:", self_key_pair);
 
+
+            $('#send').on('click', function () {
+                var message = $('#message').val();
+
+                socket_messages.emit('message from user', message);
+
+            });
+
+            socket_messages.on('from flask', function (msg) {
+                alert(msg);
+            });
+
+            var root_chain_key = nacl.util.decodeUTF8('1234567890abcdef1234567890abcdef');
+            var sending_chain_key = nacl.util.decodeUTF8('heyyosuckaabcdef1234567890abcdef');
+            var receiving_chain_key = nacl.util.decodeUTF8('heyyosuckaabcdef1234567890abcdef');
+
+            var private_socket = io('http://127.0.0.1:5000/private')
+            var re = new RegExp(name + "=([^;]+)");
+            var value = re.exec(document.cookie);
+            username = value[1]
+            private_socket.emit('username', username);
+
+            socket_keys.on('resetDHRequest', function (arr) {
+                console.log("New DH pair generated");
+                self_key_pair = generatePair();
+                console.log(self_key_pair);
+                arr = [username, self_key_pair[1]];
+                socket_keys.emit('publKey', arr);
+            });
+
+            socket_keys.on('resetChainKeyRequest', function (arr) {
+                socket_keys.emit('public_key_request', [username, arr['sender']]);
+                socket_keys.on('public_key_returning', function (info) {
+                    console.log("pubKeyReceived", info[0]);
+                    pubKey = info[0]
+                    shared_key = power(pubKey, self_key_pair[0], 1312343);
+                    console.log("Shared Key", shared_key);
+                    console.log("Resetting chain keys");
+                    hkdf_output = hkdfx(root_chain_key, shared_key);
+                    root_chain_key = hkdf_output[0];
+                    sending_chain_key = hkdf_output[1];
+                    hkdf_output = hkdfx(root_chain_key, shared_key);
+                    receiving_chain_key = hkdf_output[1];
+                });
+            })
+
+            $('#send_private_message').on('click', function () {
+                var recipient = $('#send_to_username').val();
+                var message_to_send = $('#private_message').val();
+                private_socket.emit('private_message', { 'username': recipient, 'sender': username, 'message': encodeString(message_to_send) });
+            });
+            //display who sent the message as well.
+            private_socket.on('new_private_message', function (info) {
+                $("#messages").append('<li>' + decodeString(info[0]) + '</li>');
+                console.log("number of messages", info[1]);
+                console.log("sender", info[2]);
+                if (info[1] % 3 == 0 && info[1] != 0) {
+                    socket_keys.emit('resetDHpair', { 'sender': username, 'receiver': info[2] });
+                    var i=0
+                    while(i!=100000){i++}
+                    self_key_pair = generatePair();
+                    console.log(self_key_pair);
+                    console.log("New DH Pair Generated");
+                    arr = [username, self_key_pair[1]];
+                    socket_keys.emit('publKey', arr);
+                    socket_keys.emit('resetChainKeys', { 'sender': username, 'receiver': info[2]});
+                    socket_keys.emit('public_key_request', [username, info[2]]);
+                    socket_keys.on('public_key_returning', function (info) {
+                        console.log("pubKeyReceived", info[0]);
+                        pubKey = info[0]
+                        //console.log('Shared key : ', power(pubKey, self_key_pair[0], 1312343));
+                        shared_key = power(pubKey, self_key_pair[0], 1312343);
+                        console.log("Shared Key", shared_key);
+                        console.log("Resetting chain keys");
+                        hkdf_output = hkdfx(root_chain_key, shared_key);
+                        root_chain_key = hkdf_output[0];
+                        sending_chain_key = hkdf_output[1];
+                        hkdf_output = hkdfx(root_chain_key, shared_key);
+                        receiving_chain_key = hkdf_output[1];
+                    });
+                }
+            });
         });
+    </script>
+    <script type="text/javascript">
+        //this function needs to be rewritten with a stronger encryption scheme.
+        function encodeString(str) {
+            var result = escape(str);
+            return result;
+        }
+        function decodeString(str) {
+            var result = unescape(str);
+            return result;
+        }
 
-        socket_messages.on('from flask', function (msg) {
-            alert(msg);
-        });
-
-        var private_socket = io('http://127.0.0.1:5000/private')
-        var re=new RegExp(name+"=([^;]+)");
-	    var value=re.exec(document.cookie);
-	    username=value[1]
-        private_socket.emit('username', username);
-
-        $('#send_private_message').on('click', function () {
-            var recipient = $('#send_to_username').val();
-            var message_to_send = $('#private_message').val();
-            private_socket.emit('private_message', { 'username': recipient, 'message': encodeString(message_to_send) });
-        });
-        //display who sent the message as well.
-        private_socket.on('new_private_message', function (msg) {
-            $("#messages").append('<li>' + decodeString(msg) + '</li>');
-        });
-    });
-</script>
-<script type="text/javascript">
-    //this function needs to be rewritten with a stronger encryption scheme.
-    function encodeString(str)
-    {
-        var result = escape(str);    
-        return result;
-    }
-    function decodeString(str)
-    {
-        var result=unescape(str);
-        return result;
-    }
-
-</script>
+    </script>
 </body>
+
 </html>

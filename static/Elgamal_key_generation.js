@@ -1,4 +1,4 @@
-function getRandomInt(min, max) {
+/* function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -65,7 +65,8 @@ function encrypt(msg, q, h, g) {
         // console.log(en_msg.charCodeAt(i));
     }
     // console.log(en2_msg);
-    return [en2_msg, p];
+    //return [en2_msg, p];
+
 }
 
 function decrypt(en_msg, p, a, q)
@@ -102,4 +103,48 @@ console.log("Encrypted message is " + result[0]);
 // console.log(p);
 var decrypted_msg = decrypt(result[0], result[1], a, q);
 console.log("Decrypted message is " + decrypted_msg);
+ */
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
+function generate_private_key(q) {
+    key = getRandomInt(Math.pow(10, 2), q);
+    while (gcd(q, key) != 1)
+        key = getRandomInt(Math.pow(10, 2), q)
+
+    return key;
+}
+
+function gcd(a, b) {
+    if (!b) {
+        return a;
+    }
+
+    return gcd(b, a % b);
+}
+
+function power(x, y, p) {
+    var res = 1;
+
+    x = x % p;
+
+    while (y > 0) {
+        if (y & 1)
+            res = (res * x) % p;
+        y = y >> 1;
+        x = (x * x) % p;
+    }
+    return res;
+}
+
+function generatePair() {
+    var q = 1312343;
+    // var g = getRandomInt(2, q);
+    var g = 10000;     //generator
+    var a = generate_private_key(q); //private key
+    var h = power(g, a, q);         //public key
+    return [a, h];                  //[private key,public key]
+}

@@ -7,6 +7,9 @@ app.config.from_object('config.Config')
 socketio = SocketIO(app)
 
 users = {}
+public_keys={}
+nmsgs=0
+
 @socketio.on('message')
 def handlemessage( json ):
     print('message received '+ str( json ))
@@ -27,14 +30,37 @@ def receive_message_from_user(message):
 @socketio.on('username', namespace='/private')
 def receive_username(username):
     users[username] = request.sid
-    print('Username added!')
+    print('Username', username, 'added!')
+
+@socketio.on('publKey', namespace='/keys')
+def receive_public_key(arr):
+   public_keys[arr[0]]=arr[1]
+
+@socketio.on('resetDHpair', namespace='/keys')
+def send_reset_request(arr):
+   emit('resetDHRequest',arr,room=users[arr['receiver']])
+
+@socketio.on('resetChainKeys', namespace='/keys')
+def send_reset_request(arr):
+   emit('resetChainKeyRequest',arr,room=users[arr['receiver']])
+
+@socketio.on('public_key_request', namespace='/keys')
+def send_public_key(arr):
+   global nmsgs
+   print("here sender",arr[0])
+   print("here receiver",arr[1])
+   print(public_keys[arr[1]])
+   info=[public_keys[arr[1]],nmsgs]
+   emit('public_key_returning',info,room=users[arr[0]])
 
 @socketio.on('private_message', namespace='/private')
 def private_message(payload):
-    recipient_session_id = users[payload['username']]
-    message = payload['message']
-
-    emit('new_private_message', message, room=recipient_session_id)
+   global nmsgs
+   recipient_session_id = users[payload['username']]
+   message = payload['message']
+   info=[message,nmsgs,payload['sender']]
+   nmsgs+=1
+   emit('new_private_message', info, room=recipient_session_id)
 
 @app.route('/upload')
 def upload_file():

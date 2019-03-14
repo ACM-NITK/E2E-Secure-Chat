@@ -14,21 +14,6 @@ function HMAC(ck) {
     var next_chain_key_arr = sha256.hmac(ck, chain_key_const);
     var next_msg_key_arr =sha256.hmac(ck, msg_key_const);
 
-    var next_msg_key = arrayToStr(next_msg_key_arr);
-    var next_chain_key =arrayToStr(next_chain_key_arr);
-
-    //console.log(next_chain_key);
-    //console.log(next_msg_key);
-
-    arr=[next_chain_key,next_msg_key];
-    //console.log(arr);
+    arr=[next_chain_key_arr,next_msg_key_arr];
     return arr;
 }
-function arrayToStr(array){
-    result=''
-    for(i=0;i<32;i++){
-        result+=String.fromCharCode(array[i]%128);
-    }
-    return result;
-}
-
